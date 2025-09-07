@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earning App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* CSS কোড এখানে থাকবে */
+        :root { --primary-color: #f39c12; --dark-color: #1a1a2e; --bg-start: #16213e; --bg-end: #0f3460; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); min-height: 100vh; color: #E0E0E0; overflow-x: hidden; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 400px; background: transparent; min-height: 100vh; position: relative; }
+        .glass-card { background: rgba(255, 255, 255, 0.1); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2); margin-bottom: 20px; padding: 25px; position: relative; overflow: hidden; }
+        .header { background: rgba(26, 26, 46, 0.5); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .header-left { display: flex; align-items: center; gap: 12px; } .header-profile { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary-color); } .header-info h3 { font-size: 16px; font-weight: 600; } .header-info p { font-size: 12px; opacity: 0.9; display: flex; align-items: center; gap: 4px; }
+        .icon { width: 16px; height: 16px; object-fit: contain; } .icon-lg { width: 24px; height: 24px; object-fit: contain; }
+        .page { display: none; padding: 20px; padding-bottom: 100px; } .page.active { display: block; }
+        .balance-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; } .balance-user { display: flex; align-items: center; gap: 12px; } .balance-pic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--primary-color); } .balance-info h3 { font-size: 16px; margin-bottom: 2px; } .balance-info p { font-size: 12px; opacity: 0.8; } .balance-amount { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 8px; } .balance-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid rgba(243, 156, 18, 0.3); padding-top: 20px; } .balance-stat h4 { font-size: 20px; margin-bottom: 5px; display: flex; align-items: center; gap: 4px; } .balance-stat p { font-size: 12px; opacity: 0.8; }
+        .invite-card { background: linear-gradient(135deg, var(--primary-color) 0%, #e67e22 100%); color: white; } .invite-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; } .invite-header h3 { font-size: 18px; } .invite-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; } .invite-desc { font-size: 14px; opacity: 0.9; margin-bottom: 15px; } .invite-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; } .invite-btn:hover { background: rgba(255,255,255,0.3); }
+        .task-section h2 { color: white; margin-bottom: 20px; font-size: 18px; } .task-card { display: flex; align-items: center; justify-content: space-between; padding: 20px; } .task-info { display: flex; align-items: center; gap: 15px; } .task-icon { width: 50px; height: 50px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; } .task-details h3 { font-size: 16px; color: white; margin-bottom: 5px; } .task-details p { font-size: 12px; color: #bdc3c7; } .task-badge { background: linear-gradient(135deg, var(--primary-color), #e67e22); color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; } .primary-btn { background: linear-gradient(135deg, var(--primary-color) 0%, #e67e22 100%); color: white; border: none; padding: 15px 30px; border-radius: 15px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px; transition: all 0.3s ease; }
+        .referral-link-section { margin-top: 30px; } .link-input-group { display: flex; gap: 10px; } .link-input { flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 14px; background: rgba(0,0,0,0.2); color: white; } .copy-btn { background: var(--primary-color); color: white; border: none; padding: 12px 15px; border-radius: 8px; cursor: pointer; } .share-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; } .share-btn { padding: 15px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: white; } .telegram-btn { background: #2980b9; } .whatsapp-btn { background: #27ae60; }
+        .profile-card { text-align: center; } .profile-pic { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 15px; border: 4px solid var(--primary-color); } .profile-name { font-size: 20px; font-weight: 700; margin-bottom: 5px; color: white; } .join-date { color: #bdc3c7; font-size: 14px; } .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; } .stat-card { text-align: center; padding: 20px; } .stat-label { font-size: 12px; color: #bdc3c7; margin-bottom: 5px; } .stat-value { font-size: 18px; font-weight: 700; color: white; }
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 400px; background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; color: #bdc3c7; min-width: 60px; padding: 5px; border-radius: 10px; transition: all 0.2s ease; } .nav-item.active { color: var(--primary-color); background: rgba(243, 156, 18, 0.1); } .nav-icon { width: 24px; height: 24px; object-fit: contain; } .nav-label { font-size: 10px; font-weight: 600; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.3); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- HTML অংশ এখানে শুরু -->
+    <div id="loader"><div class="spinner"></div></div>
+    <div class="container">
+        <!-- Header, Pages, Navigation Bar এর HTML কোড এখানে থাকবে... -->
+         <div class="header"><div class="header-left"><img id="headerProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="header-profile"><div class="header-info"><h3 id="userName">Loading...</h3><p>Balance: <img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="headerBalanceValue">0</span></p></div></div></div>
+        <div id="homePage" class="page active"><div class="balance-card glass-card"><div class="balance-header"><div class="balance-user"><img id="balanceProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="balance-pic"><div class="balance-info"><h3 id="balanceUserName">Loading...</h3></div></div><div class="balance-amount"><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon-lg"> <span id="totalBalanceAmount">0</span></div></div><div class="balance-stats"><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="balanceTotal">0</span></h4><p>Total Balance</p></div><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="balanceEarning">0</span></h4><p>Total Earning</p></div></div></div><div class="invite-card"><div class="invite-header"><h3>Invite Friends & Earn</h3><div class="invite-icon"><img src="https://i.ibb.co/L6V61Y1/refer.png" alt="Refer" class="icon-lg"></div></div><p class="invite-desc">Get rewards for every friend you invite!</p><button class="invite-btn" onclick="navigateTo('referPage')">Start Referring</button></div><div class="task-section"><h2>Available Tasks</h2><div class="task-card glass-card"><div class="task-info"><div class="task-icon"><img src="https://i.ibb.co/mG7pWv4/ads.png" alt="Ads" class="icon-lg"></div><div class="task-details"><h3>Watch Ads</h3><p>Earn by watching short video ads</p></div></div><div class="task-badge">Ads</div></div><button class="primary-btn" onclick="navigateTo('adsPage')">Start Task</button></div></div>
+        <div id="adsPage" class="page"><h2>Ads Page (Coming Soon)</h2></div>
+        <div id="referPage" class="page"><div class="glass-card"><h2>Refer & Earn</h2><p>Share your link with friends to earn rewards.</p><div class="referral-link-section"><h3>Your Referral Link</h3><div class="link-input-group"><input type="text" id="referralLink" class="link-input" value="Loading..." readonly><button class="copy-btn" id="copyLinkBtn">Copy</button></div></div><div class="share-buttons"><button class="share-btn telegram-btn" id="telegramShareBtn"><img src="https://i.ibb.co/L8vTCRm/telegram.png" alt="Telegram" class="icon">Telegram</button><button class="share-btn whatsapp-btn" id="whatsappShareBtn"><img src="https://i.ibb.co/b3S0j8q/whatsapp.png" alt="WhatsApp" class="icon">WhatsApp</button></div></div></div>
+        <div id="withdrawPage" class="page"><h2>Withdraw Page (Coming Soon)</h2></div>
+        <div id="profilePage" class="page"><div class="profile-card glass-card"><img id="profilePagePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="profile-pic"><h2 class="profile-name" id="profileName">Loading...</h2><p class="join-date" id="joinDate">Joined...</p></div><div class="stats-grid"><div class="stat-card glass-card"><p class="stat-label">Total Earned</p><p class="stat-value" id="profileTotalEarned">0</p></div><div class="stat-card glass-card"><p class="stat-label">Tasks Done</p><p class="stat-value" id="profileTasksDone">0</p></div><div class="stat-card glass-card"><p class="stat-label">My Balance</p><p class="stat-value" id="profileBalance">0</p></div><div class="stat-card glass-card"><p class="stat-label">Referrals</p<p class="stat-value" id="profileReferrals">0</p></div></div></div>
+        <div class="bottom-nav"><div class="nav-item active" data-page="homePage"><img src="https://i.ibb.co/GnhWfM8/home.png" alt="Home" class="nav-icon"><div class="nav-label">Home</div></div><div class="nav-item" data-page="adsPage"><img src="https://i.ibb.co/mG7pWv4/ads.png" alt="Ads" class="nav-icon"><div class="nav-label">Ads Task</div></div><div class="nav-item" data-page="referPage"><img src="https://i.ibb.co/L6V61Y1/refer.png" alt="Refer" class="nav-icon"><div class="nav-label">Refer</div></div><div class="nav-item" data-page="withdrawPage"><img src="https://i.ibb.co/JqKxZzD/withdraw.png" alt="Withdraw" class="nav-icon"><div class="nav-label">Withdraw</div></div><div class="nav-item" data-page="profilePage"><img src="https://i.ibb.co/J56pGbf/profile.png" alt="Profile" class="nav-icon"><div class="nav-label">Profile</div></div></div>
+    </div>
+    
+    <script>
+        // ==========================================
+        // আপনার Firebase কনফিগারেশন
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCQkckxOt7CC1dvawMpBnF99GW940kitg8",
+            authDomain: "promotion-app-38424.firebaseapp.com",
+            projectId: "promotion-app-38424",
+            storageBucket: "promotion-app-38424.appspot.com",
+            messagingSenderId: "216320652641",
+            appId: "1:216320652641:web:73106abf936ade4b244120",
+            measurementId: "G-76MH7NH873"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        const loader = document.getElementById('loader');
+        
+        // ==========================================
+        // আপনার টেলিগ্রাম বটের ইউজারনেম এখানে দিন
+        // ==========================================
+        const BOT_USERNAME = "YourBotUsername"; // যেমন: MyAwesomeBot
+
+        async function main() {
+            try {
+                const tgUser = tg.initDataUnsafe.user;
+                if (!tgUser) {
+                    document.body.innerHTML = "<h1>Please open this app inside Telegram.</h1>";
+                    return;
+                }
+                const userData = await getUserOrCreateFirestoreAccount(tgUser);
+                if(userData){
+                    updateUI(userData, tgUser);
+                    loader.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("An error occurred:", error);
+                loader.innerText = "Error loading app. Please restart.";
+            }
+        }
+        
+        async function getUserOrCreateFirestoreAccount(tgUser) {
+            const userRef = db.collection('users').doc(String(tgUser.id));
+            const doc = await userRef.get();
+            if (!doc.exists) {
+                console.log('User not found. Creating a new account in Firestore...');
+                const newUser = {
+                    telegram_id: tgUser.id,
+                    first_name: tgUser.first_name,
+                    username: tgUser.username || null,
+                    balance: 0,
+                    total_ads_watched: 0,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await userRef.set(newUser);
+                // ডেটাবেস থেকে আবার ডেটা রিড করছি যাতে সার্ভার টাইমস্ট্যাম্প ঠিকমতো আসে
+                const newDoc = await userRef.get();
+                console.log('New user created:', newDoc.data());
+                return newDoc.data();
+            } else {
+                console.log('User found:', doc.data());
+                return doc.data();
+            }
+        }
+        
+        function updateUI(dbUser, tgUser) {
+            const defaultProfilePic = 'https://i.ibb.co/L5k6v7R/default-profile.jpg';
+            const fullName = dbUser.first_name || 'User';
+            document.querySelectorAll('#userName, #balanceUserName, #profileName').forEach(el => el.textContent = fullName);
+            document.querySelectorAll('#headerProfilePic, #balanceProfilePic, #profilePagePic').forEach(el => el.src = tgUser.photo_url || defaultProfilePic);
+            const balance = dbUser.balance || 0;
+            const totalEarnings = dbUser.total_ads_watched * 10;
+            document.getElementById('headerBalanceValue').textContent = balance;
+            document.getElementById('totalBalanceAmount').textContent = balance;
+            document.getElementById('balanceTotal').textContent = balance;
+            document.getElementById('balanceEarning').textContent = totalEarnings;
+            document.getElementById('profileTotalEarned').textContent = totalEarnings;
+            document.getElementById('profileBalance').textContent = balance;
+            document.getElementById('profileTasksDone').textContent = dbUser.total_ads_watched || 0;
+            document.getElementById('profileReferrals').textContent = 0;
+            const joinDate = dbUser.created_at ? dbUser.created_at.toDate() : new Date();
+            document.getElementById('joinDate').textContent = `Joined ${joinDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+            const referralLink = `https://t.me/${BOT_USERNAME}?start=${dbUser.telegram_id}`;
+            document.getElementById('referralLink').value = referralLink;
+        }
+
+        function navigateTo(pageId) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.getElementById(pageId).classList.add('active'); }
+        document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); this.classList.add('active'); navigateTo(this.getAttribute('data-page')); }); });
+        document.getElementById('copyLinkBtn').addEventListener('click', function() { const linkInput = document.getElementById('referralLink'); linkInput.select(); document.execCommand('copy'); tg.HapticFeedback.notificationOccurred('success'); alert('Referral link copied!'); });
+        
+        window.addEventListener('load', main);
+    </script>
+</body>
+</html>

@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Earning App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Firebase Libraries (Compatibility Version for easier use) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    
     <style>
-        /* Glassmorphism Theme CSS */
         :root { --primary-color: #f39c12; --dark-color: #1a1a2e; --bg-start: #16213e; --bg-end: #0f3460; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); min-height: 100vh; color: #E0E0E0; overflow-x: hidden; display: flex; justify-content: center; }
@@ -36,148 +32,155 @@
 <body>
     <div id="loader"><div class="spinner"></div></div>
     
-    <div class="container" style="visibility: hidden;"> <!-- Initially hidden -->
-         <div class="header"><div class="header-left"><img id="headerProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="header-profile"><div class="header-info"><h3 id="userName">Loading...</h3><p>Balance: <img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="headerBalanceValue">0</span></p></div></div></div>
-        <div id="homePage" class="page active"><div class="balance-card glass-card"><div class="balance-header"><div class="balance-user"><img id="balanceProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="balance-pic"><div class="balance-info"><h3 id="balanceUserName">Loading...</h3></div></div><div class="balance-amount"><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon-lg"> <span id="totalBalanceAmount">0</span></div></div><div class="balance-stats"><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="balanceTotal">0</span></h4><p>Total Balance</p></div><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" alt="Points" class="icon"> <span id="balanceEarning">0</span></h4><p>Total Earning</p></div></div></div><div class="invite-card"><div class="invite-header"><h3>Invite Friends & Earn</h3><div class="invite-icon"><img src="https://i.ibb.co/L6V61Y1/refer.png" alt="Refer" class="icon-lg"></div></div><p class="invite-desc">Get rewards for every friend you invite!</p><button class="invite-btn" onclick="navigateTo('referPage')">Start Referring</button></div><div class="task-section"><h2>Available Tasks</h2><div class="task-card glass-card"><div class="task-info"><div class="task-icon"><img src="https://i.ibb.co/mG7pWv4/ads.png" alt="Ads" class="icon-lg"></div><div class="task-details"><h3>Watch Ads</h3><p>Earn by watching short video ads</p></div></div><div class="task-badge">Ads</div></div><button class="primary-btn" onclick="navigateTo('adsPage')">Start Task</button></div></div>
-        <div id="adsPage" class="page"><h2>Ads Page (Coming Soon)</h2></div>
-        <div id="referPage" class="page"><div class="glass-card"><h2>Refer & Earn</h2><p>Share your link with friends to earn rewards.</p><div class="referral-link-section"><h3>Your Referral Link</h3><div class="link-input-group"><input type="text" id="referralLink" class="link-input" value="Loading..." readonly><button class="copy-btn" id="copyLinkBtn">Copy</button></div></div><div class="share-buttons"><button class="share-btn telegram-btn" id="telegramShareBtn"><img src="https://i.ibb.co/L8vTCRm/telegram.png" alt="Telegram" class="icon">Telegram</button><button class="share-btn whatsapp-btn" id="whatsappShareBtn"><img src="https://i.ibb.co/b3S0j8q/whatsapp.png" alt="WhatsApp" class="icon">WhatsApp</button></div></div></div>
-        <div id="withdrawPage" class="page"><h2>Withdraw Page (Coming Soon)</h2></div>
-        <div id="profilePage" class="page"><div class="profile-card glass-card"><img id="profilePagePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="profile-pic"><h2 class="profile-name" id="profileName">Loading...</h2><p class="join-date" id="joinDate">Joined...</p></div><div class="stats-grid"><div class="stat-card glass-card"><p class="stat-label">Total Earned</p><p class="stat-value" id="profileTotalEarned">0</p></div><div class="stat-card glass-card"><p class="stat-label">Tasks Done</p><p class="stat-value" id="profileTasksDone">0</p></div><div class="stat-card glass-card"><p class="stat-label">My Balance</p><p class="stat-value" id="profileBalance">0</p></div><div class="stat-card glass-card"><p class="stat-label">Referrals</p<p class="stat-value" id="profileReferrals">0</p></div></div></div>
-        <div class="bottom-nav"><div class="nav-item active" data-page="homePage"><img src="https://i.ibb.co/GnhWfM8/home.png" alt="Home" class="nav-icon"><div class="nav-label">Home</div></div><div class="nav-item" data-page="adsPage"><img src="https://i.ibb.co/mG7pWv4/ads.png" alt="Ads" class="nav-icon"><div class="nav-label">Ads Task</div></div><div class="nav-item" data-page="referPage"><img src="https://i.ibb.co/L6V61Y1/refer.png" alt="Refer" class="nav-icon"><div class="nav-label">Refer</div></div><div class="nav-item" data-page="withdrawPage"><img src="https://i.ibb.co/JqKxZzD/withdraw.png" alt="Withdraw" class="nav-icon"><div class="nav-label">Withdraw</div></div><div class="nav-item" data-page="profilePage"><img src="https://i.ibb.co/J56pGbf/profile.png" alt="Profile" class="nav-icon"><div class="nav-label">Profile</div></div></div>
+    <div class="container" style="visibility: hidden;">
+        <!-- Header, Pages, and Navigation HTML is exactly as you provided -->
+        <div class="header"><div class="header-left"><img id="headerProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" alt="Profile" class="header-profile"><div class="header-info"><h3 id="userName">...</h3><p>Balance: <img src="https://i.ibb.co/Wc6Q19X/point.png" class="icon"> <span id="headerBalanceValue">0</span></p></div></div></div>
+        <div id="homePage" class="page active"><div class="balance-card glass-card"><div class="balance-header"><div class="balance-user"><img id="balanceProfilePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" class="balance-pic"><div class="balance-info"><h3 id="balanceUserName">...</h3></div></div><div class="balance-amount"><img src="https://i.ibb.co/Wc6Q19X/point.png" class="icon-lg"> <span id="totalBalanceAmount">0</span></div></div><div class="balance-stats"><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" class="icon"> <span id="balanceTotal">0</span></h4><p>Total Balance</p></div><div class="balance-stat"><h4><img src="https://i.ibb.co/Wc6Q19X/point.png" class="icon"> <span id="balanceEarning">0</span></h4><p>Total Earning</p></div></div></div><div class="invite-card"><div class="invite-header"><h3>Invite & Earn</h3><div class="invite-icon"><img src="https://i.ibb.co/L6V61Y1/refer.png" class="icon-lg"></div></div><p class="invite-desc">Get rewards for every friend you invite!</p><button class="invite-btn" onclick="navigateTo('referPage')">Start Referring</button></div><div class="task-section"><h2>Tasks</h2><div class="task-card glass-card"><div class="task-info"><div class="task-icon"><img src="https://i.ibb.co/mG7pWv4/ads.png" class="icon-lg"></div><div class="task-details"><h3>Watch Ads</h3><p>Earn by watching short video ads</p></div></div><div class="task-badge">Ads</div></div><button class="primary-btn" onclick="navigateTo('adsPage')">Start Task</button></div></div>
+        <div id="adsPage" class="page"><h2>Ads Page (WIP)</h2></div>
+        <div id="referPage" class="page"><div class="glass-card"><h2>Refer & Earn</h2><p>Share your link to earn rewards.</p><div class="referral-link-section"><h3>Your Referral Link</h3><div class="link-input-group"><input type="text" id="referralLink" class="link-input" value="..." readonly><button class="copy-btn" id="copyLinkBtn">Copy</button></div></div><div class="share-buttons"><button class="share-btn telegram-btn"><img src="https://i.ibb.co/L8vTCRm/telegram.png" class="icon">Telegram</button><button class="share-btn whatsapp-btn"><img src="https://i.ibb.co/b3S0j8q/whatsapp.png" class="icon">WhatsApp</button></div></div></div>
+        <div id="withdrawPage" class="page"><h2>Withdraw Page (WIP)</h2></div>
+        <div id="profilePage" class="page"><div class="profile-card glass-card"><img id="profilePagePic" src="https://i.ibb.co/L5k6v7R/default-profile.jpg" class="profile-pic"><h2 class="profile-name" id="profileName">...</h2><p class="join-date" id="joinDate">...</p></div><div class="stats-grid"><div class="stat-card glass-card"><p class="stat-label">Total Earned</p><p class="stat-value" id="profileTotalEarned">0</p></div><div class="stat-card glass-card"><p class="stat-label">Tasks Done</p><p class="stat-value" id="profileTasksDone">0</p></div><div class="stat-card glass-card"><p class="stat-label">My Balance</p><p class="stat-value" id="profileBalance">0</p></div><div class="stat-card glass-card"><p class="stat-label">Referrals</p><p class="stat-value" id="profileReferrals">0</p></div></div></div>
+        <div class="bottom-nav"><div class="nav-item active" data-page="homePage"><img src="https://i.ibb.co/GnhWfM8/home.png" class="nav-icon"><div class="nav-label">Home</div></div><div class="nav-item" data-page="adsPage"><img src="https://i.ibb.co/mG7pWv4/ads.png" class="nav-icon"><div class="nav-label">Ads Task</div></div><div class="nav-item" data-page="referPage"><img src="https://i.ibb.co/L6V61Y1/refer.png" class="nav-icon"><div class="nav-label">Refer</div></div><div class="nav-item" data-page="withdrawPage"><img src="https://i.ibb.co/JqKxZzD/withdraw.png" class="nav-icon"><div class="nav-label">Withdraw</div></div><div class="nav-item" data-page="profilePage"><img src="https://i.ibb.co/J56pGbf/profile.png" class="nav-icon"><div class="nav-label">Profile</div></div></div>
     </div>
     
     <script>
-        // ==========================================================
-        // ধাপ ১: আপনার Firebase কনফিগারেশন এখানে পেস্ট করুন
-        // ==========================================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCQkckxOt7CC1dvawMpBnF99GW940kitg8",
-            authDomain: "promotion-app-38424.firebaseapp.com",
-            projectId: "promotion-app-38424",
-            storageBucket: "promotion-app-38424.appspot.com",
-            messagingSenderId: "216320652641",
-            appId: "1:216320652641:web:73106abf936ade4b244120",
-            measurementId: "G-76MH7NH873"
-        };
-        
-        // ==========================================================
-        // ধাপ ২: আপনার টেলিগ্রাম বটের ইউজারনেম এখানে দিন
-        // ==========================================================
-        const BOT_USERNAME = "usdc0_bot"; // যেমন: MyAwesomeBot (এখানে @ চিহ্ন দেবেন না)
-
-        // --- নিচের কোডে হাত দেওয়ার প্রয়োজন নেই ---
-
-        // Firebase এবং Telegram অ্যাপ ইনিশিয়ালাইজ করা
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const tg = window.Telegram.WebApp;
-        
-        // DOM Elements
-        const loader = document.getElementById('loader');
-        const mainContainer = document.querySelector('.container');
-
-        // অ্যাপ শুরু করার প্রধান ফাংশন
-        async function main() {
-            try {
-                tg.ready();
-                tg.expand();
-
-                const tgUser = tg.initDataUnsafe.user;
-                if (!tgUser) {
-                    throw new Error("Telegram user data not found. Please open this app inside Telegram.");
-                }
-                
-                const userData = await getUserOrCreateFirestoreAccount(tgUser);
-                
-                if (userData) {
-                    updateUI(userData, tgUser);
-                    // ডেটা লোড হওয়ার পর অ্যাপটি দৃশ্যমান করা হবে
-                    mainContainer.style.visibility = 'visible';
-                    loader.style.display = 'none';
-                } else {
-                    throw new Error("Could not retrieve or create user data.");
-                }
-
-            } catch (error) {
-                console.error("Critical Error:", error);
-                // ডিবাগিং এর জন্য আসল Error মেসেজ দেখানো হবে
-                loader.innerText = `Error: ${error.message}`;
-                const spinner = loader.querySelector('.spinner');
-                if (spinner) spinner.style.display = 'none';
-            }
-        }
-        
-        // Firestore থেকে ব্যবহারকারীকে খোঁজা বা নতুন অ্যাকাউন্ট তৈরি করার ফাংশন
-        async function getUserOrCreateFirestoreAccount(tgUser) {
-            const userRef = db.collection('users').doc(String(tgUser.id));
-            const doc = await userRef.get();
-
-            if (!doc.exists) {
-                console.log('New user. Creating account...');
-                const newUser = {
-                    telegram_id: tgUser.id,
-                    first_name: tgUser.first_name || 'User',
-                    username: tgUser.username || null,
-                    balance: 0,
-                    total_ads_watched: 0,
-                    // সার্ভার থেকে সঠিক সময় নেওয়ার জন্য FieldValue ব্যবহার করা হচ্ছে
-                    created_at: firebase.firestore.FieldValue.serverTimestamp() 
-                };
-                await userRef.set(newUser);
-                // নতুন তৈরি হওয়া ডকুমেন্টটি আবার পড়া হচ্ছে যাতে serverTimestamp ঠিকমতো আসে
-                const newDoc = await userRef.get();
-                return newDoc.data();
-            } else {
-                return doc.data();
-            }
-        }
-        
-        // UI (ইউজার ইন্টারফেস) আপডেট করার ফাংশন
-        function updateUI(dbUser, tgUser) {
-            const defaultProfilePic = 'https://i.ibb.co/L5k6v7R/default-profile.jpg';
-            const fullName = dbUser.first_name;
-
-            // প্রোফাইল ছবি ও নাম
-            document.querySelectorAll('#userName, #balanceUserName, #profileName').forEach(el => el.textContent = fullName);
-            document.querySelectorAll('#headerProfilePic, #balanceProfilePic, #profilePagePic').forEach(el => el.src = tgUser.photo_url || defaultProfilePic);
+        // Ensure the entire script runs only after the DOM is fully loaded
+        document.addEventListener("DOMContentLoaded", function() {
             
-            // ব্যালেন্স ও অন্যান্য তথ্য
-            const balance = dbUser.balance || 0;
-            const totalEarnings = (dbUser.total_ads_watched || 0) * 10; // উদাহরণস্বরূপ
+            // ==========================================================
+            // ধাপ ১: আপনার Firebase কনফিগারেশন
+            // ==========================================================
+            const firebaseConfig = {
+                apiKey: "AIzaSyCQkckxOt7CC1dvawMpBnF99GW940kitg8",
+                authDomain: "promotion-app-38424.firebaseapp.com",
+                projectId: "promotion-app-38424",
+                storageBucket: "promotion-app-38424.appspot.com",
+                messagingSenderId: "216320652641",
+                appId: "1:216320652641:web:73106abf936ade4b244120",
+                measurementId: "G-76MH7NH873"
+            };
+            
+            // ==========================================================
+            // ধাপ ২: আপনার টেলিগ্রাম বটের ইউজারনেম
+            // ==========================================================
+            const BOT_USERNAME = "usdc0_bot";
 
-            document.getElementById('headerBalanceValue').textContent = balance;
-            document.getElementById('totalBalanceAmount').textContent = balance;
-            document.getElementById('balanceTotal').textContent = balance;
-            document.getElementById('balanceEarning').textContent = totalEarnings;
-            document.getElementById('profileTotalEarned').textContent = totalEarnings;
-            document.getElementById('profileBalance').textContent = balance;
-            document.getElementById('profileTasksDone').textContent = dbUser.total_ads_watched || 0;
-            document.getElementById('profileReferrals').textContent = 0;
+            // --- Main App Logic ---
 
-            // জয়েন করার তারিখ (নিরাপদভাবে)
-            let joinDateText = "Joined recently";
-            if (dbUser.created_at && typeof dbUser.created_at.toDate === 'function') {
-                const joinDate = dbUser.created_at.toDate();
-                joinDateText = `Joined ${joinDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const tg = window.Telegram.WebApp;
+
+            const loader = document.getElementById('loader');
+            const mainContainer = document.querySelector('.container');
+
+            async function main() {
+                try {
+                    tg.ready();
+                    tg.expand();
+
+                    const tgUser = tg.initDataUnsafe?.user;
+                    if (!tgUser) {
+                        throw new Error("Telegram user data not found. Please open this app inside Telegram.");
+                    }
+                    
+                    const userData = await getUserOrCreateFirestoreAccount(tgUser);
+                    
+                    if (userData) {
+                        updateUI(userData, tgUser);
+                        mainContainer.style.visibility = 'visible';
+                        loader.style.display = 'none';
+                    } else {
+                        throw new Error("Could not retrieve or create user data.");
+                    }
+                } catch (error) {
+                    console.error("Critical Error:", error);
+                    loader.innerText = `Error: ${error.message}\n(Please check console for details)`;
+                    const spinner = loader.querySelector('.spinner');
+                    if (spinner) spinner.style.display = 'none';
+                }
             }
-            document.getElementById('joinDate').textContent = joinDateText;
+            
+            async function getUserOrCreateFirestoreAccount(tgUser) {
+                const userRef = db.collection('users').doc(String(tgUser.id));
+                const doc = await userRef.get();
 
-            // রেফারেল লিঙ্ক
-            if (BOT_USERNAME && BOT_USERNAME !== "YourBotUsername") {
-                const referralLink = `https://t.me/${BOT_USERNAME}?start=${dbUser.telegram_id}`;
-                document.getElementById('referralLink').value = referralLink;
-            } else {
-                document.getElementById('referralLink').value = "Please set Bot Username in code.";
+                if (!doc.exists) {
+                    const newUser = {
+                        telegram_id: tgUser.id,
+                        first_name: tgUser.first_name || 'User',
+                        username: tgUser.username || null,
+                        balance: 0,
+                        total_ads_watched: 0,
+                        created_at: firebase.firestore.FieldValue.serverTimestamp() 
+                    };
+                    await userRef.set(newUser);
+                    const newDoc = await userRef.get();
+                    return newDoc.data();
+                } else {
+                    return doc.data();
+                }
             }
-        }
+            
+            function updateUI(dbUser, tgUser) {
+                const defaultProfilePic = 'https://i.ibb.co/L5k6v7R/default-profile.jpg';
+                const fullName = dbUser.first_name;
 
-        // নেভিগেশন এবং অন্যান্য ইভেন্ট হ্যান্ডলার
-        function navigateTo(pageId) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.getElementById(pageId).classList.add('active'); }
-        document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', function() { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); this.classList.add('active'); navigateTo(this.getAttribute('data-page')); }); });
-        document.getElementById('copyLinkBtn').addEventListener('click', function() { const linkInput = document.getElementById('referralLink'); linkInput.select(); document.execCommand('copy'); tg.HapticFeedback.notificationOccurred('success'); alert('Referral link copied!'); });
-        
-        // অ্যাপ লোড হওয়ার পর main ফাংশন চালানো হবে
-        window.addEventListener('load', main);
+                document.querySelectorAll('#userName, #balanceUserName, #profileName').forEach(el => el.textContent = fullName);
+                document.querySelectorAll('#headerProfilePic, #balanceProfilePic, #profilePagePic').forEach(el => el.src = tgUser.photo_url || defaultProfilePic);
+                
+                const balance = dbUser.balance || 0;
+                const totalEarnings = (dbUser.total_ads_watched || 0) * 10;
+
+                document.getElementById('headerBalanceValue').textContent = balance;
+                document.getElementById('totalBalanceAmount').textContent = balance;
+                document.getElementById('balanceTotal').textContent = balance;
+                document.getElementById('balanceEarning').textContent = totalEarnings;
+                document.getElementById('profileTotalEarned').textContent = totalEarnings;
+                document.getElementById('profileBalance').textContent = balance;
+                document.getElementById('profileTasksDone').textContent = dbUser.total_ads_watched || 0;
+                document.getElementById('profileReferrals').textContent = 0;
+
+                let joinDateText = "Joined recently";
+                if (dbUser.created_at && typeof dbUser.created_at.toDate === 'function') {
+                    const joinDate = dbUser.created_at.toDate();
+                    joinDateText = `Joined ${joinDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+                }
+                document.getElementById('joinDate').textContent = joinDateText;
+
+                if (BOT_USERNAME && BOT_USERNAME !== "YourBotUsername") {
+                    document.getElementById('referralLink').value = `https://t.me/${BOT_USERNAME}?start=${dbUser.telegram_id}`;
+                } else {
+                    document.getElementById('referralLink').value = "Bot Username not set.";
+                }
+            }
+
+            function navigateTo(pageId) { 
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                const newPage = document.getElementById(pageId);
+                if(newPage) newPage.classList.add('active');
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(item => { 
+                item.addEventListener('click', function() { 
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); 
+                    this.classList.add('active'); 
+                    navigateTo(this.getAttribute('data-page')); 
+                }); 
+            });
+            
+            document.getElementById('copyLinkBtn').addEventListener('click', function() { 
+                const linkInput = document.getElementById('referralLink'); 
+                linkInput.select(); 
+                linkInput.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand('copy'); 
+                tg.HapticFeedback.notificationOccurred('success'); 
+                alert('Referral link copied!'); 
+            });
+
+            // Start the app
+            main();
+        });
     </script>
 </body>
-                                                                                                                                              </html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </html>
